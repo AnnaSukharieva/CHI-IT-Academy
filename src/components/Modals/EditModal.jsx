@@ -10,39 +10,43 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { DataContext } from "../../context";
-import { useContext } from "react";
+import PropTypes from "prop-types";
+import { useContext, useCallback, useMemo } from "react";
 
 export const EditModal = ({ open, setOpen, item }) => {
   const { columns, setData, data } = useContext(DataContext);
-  const newItem = item ? { ...item } : {};
+  const newItem = useMemo(() => (item ? { ...item } : {}), [item]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setOpen(false);
-  };
+  }, [setOpen]);
 
-  const saveChanges = (e) => {
-    e.preventDefault();
-    if (item) {
-      const newData = data.map((item) => {
-        if (item.id === newItem.id) {
-          return newItem;
-        }
-        return item;
-      });
-      setData(newData);
-    } else {
-      newItem.id = data.length;
-      setData((prevData) => [newItem, ...prevData]);
-    }
-    onClose();
-  };
+  const saveChanges = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (item) {
+        const newData = data.map((item) =>
+          item.id === newItem.id ? newItem : item
+        );
+        setData(newData);
+      } else {
+        newItem.id = data.length;
+        setData((prevData) => [newItem, ...prevData]);
+      }
+      handleClose();
+    },
+    [data, handleClose, item, newItem, setData]
+  );
 
-  const editHandler = (e, columnId) => {
-    const newValue = e.target.value;
-    newItem[columnId] = newValue;
-  };
+  const editHandler = useCallback(
+    (e, columnId) => {
+      const newValue = e.target.value;
+      newItem[columnId] = newValue;
+    },
+    [newItem]
+  );
 
-  const EditFields = () => {
+  const EditFields = useCallback(() => {
     return columns.map((column) => {
       if (column.label !== "Actions") {
         return (
@@ -65,40 +69,52 @@ export const EditModal = ({ open, setOpen, item }) => {
         );
       }
     });
-  };
+  }, [columns, editHandler, item]);
 
-  return (
-    <Dialog
-      onClose={handleClose}
-      open={open}
-      PaperProps={{
-        sx: { borderRadius: 2, px: 2, py: 2 },
-      }}
-    >
-      <DialogTitle variant="h5" sx={{ display: "flex", alignItems: "center" }}>
-        <EditIcon fontSize="large" sx={{ mr: "10px" }} />
-        Edit car info
-      </DialogTitle>
-      <Divider />
-      <Box component="form" id="editForm" onSubmit={saveChanges}>
-        <DialogContent
-          sx={{
-            display: "flex",
-            justifyContent: "space-around",
-            flexWrap: "wrap",
-          }}
-        >
-          <EditFields />
-        </DialogContent>
-        <DialogActions>
-          <Button sx={{ color: "black" }} onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button variant="contained" type="submit">
-            Apply
-          </Button>
-        </DialogActions>
-      </Box>
-    </Dialog>
+  const dialog = useMemo(
+    () => (
+      <Dialog onClose={handleClose} open={open} PaperProps={PaperProps}>
+        <DialogTitle variant="h5" sx={dialogTitleStyles}>
+          <EditIcon fontSize="large" sx={{ mr: "10px" }} />
+          Edit car info
+        </DialogTitle>
+        <Divider />
+        <Box component="form" id="editForm" onSubmit={saveChanges}>
+          <DialogContent sx={dialogContentStyles}>
+            <EditFields />
+          </DialogContent>
+          <DialogActions>
+            <Button sx={{ color: "black" }} onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="contained" type="submit">
+              Apply
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+    ),
+    [handleClose, open, saveChanges]
   );
+
+  return dialog;
+};
+
+const PaperProps = {
+  sx: { borderRadius: 2, px: 2, py: 2 },
+};
+const dialogTitleStyles = {
+  display: "flex",
+  alignItems: "center",
+};
+const dialogContentStyles = {
+  display: "flex",
+  justifyContent: "space-around",
+  flexWrap: "wrap",
+};
+
+EditModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired,
+  item: PropTypes.any,
 };

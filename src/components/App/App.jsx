@@ -1,25 +1,39 @@
-import { useEffect, useState } from "react";
-import { useHttp } from "../../api/http";
-import { useCallback } from "react";
+import { Alert, Container, Box, LinearProgress } from "@mui/material";
 import { CarsTable } from "../CarsTable";
 import { LiveSearch } from "../LiveSearch";
 import { DataContext } from "../../context";
 import { AddButton } from "../AddButton";
-import { Container } from "@mui/material";
 import { columns } from "../../context";
+import { getCars } from "../../services/cars";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 const App = () => {
-  const { request } = useHttp();
+  const [error, setError] = useState("");
   const [data, setData] = useState();
-  const [filter, setFilter] = useState();
+  const [filter, setFilter] = useState("");
 
   const getElements = useCallback(async () => {
-    await request("https://myfakeapi.com/api/cars/").then((data) =>
-      setData(data.cars)
-    );
-  }, [request]);
+    await getCars().then((resp) => {
+      if (!resp.error) {
+        setData(resp.cars);
+        setError("");
+      } else {
+        setError(resp.message);
+        setData([]);
+      }
+    });
+  }, []);
 
-  const searchKeywords = (array, keyword) => {
+   const loadingLine = useMemo(
+     () => (
+       <Box sx={{ width: "100%" }}>
+         <LinearProgress />
+       </Box>
+     ),
+     []
+   );
+
+  const searchKeywords = useCallback((array, keyword) => {
     keyword = keyword.toLowerCase();
 
     return array.filter((obj) => {
@@ -30,29 +44,44 @@ const App = () => {
         }
       });
     });
-  };
+  }, []);
 
   useEffect(() => {
     getElements();
   }, [getElements]);
 
-  return (
-    <>
-      <DataContext.Provider value={{ setData, data, columns }}>
-        <Container
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <LiveSearch setFilter={setFilter} />
-          <AddButton />
-        </Container>
-        <CarsTable data={filter ? searchKeywords(data, filter) : data} />
-      </DataContext.Provider>
-    </>
+  const errorMsg = useMemo(
+    () => (error ? <Alert severity="error">{error}</Alert> : null),
+    [error]
   );
+
+  const appContent = useMemo(
+    () => (
+      <>
+        <DataContext.Provider value={{ setData, data, columns }}>
+          {errorMsg}
+          <Container
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <LiveSearch setFilter={setFilter} />
+            <AddButton />
+          </Container>
+          {!data ? (
+            loadingLine
+          ) : (
+            <CarsTable data={filter ? searchKeywords(data, filter) : data} />
+          )}
+        </DataContext.Provider>
+      </>
+    ),
+    [data, errorMsg, filter, searchKeywords]
+  );
+
+  return appContent;
 };
 
 export default App;
