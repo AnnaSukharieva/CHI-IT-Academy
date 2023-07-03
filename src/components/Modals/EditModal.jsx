@@ -9,7 +9,7 @@ import {
   Box,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import { DataContext } from "../context";
+import { DataContext } from "../../context";
 import { useContext } from "react";
 
 export const EditModal = ({ open, setOpen, item }) => {

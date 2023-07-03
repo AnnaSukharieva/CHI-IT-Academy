@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { EditModal } from "../../Modals";
+import { EditModal } from "../Modals";
 import { useState } from "react";
 
 export const AddButton = () => {

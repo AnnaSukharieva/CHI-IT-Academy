@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState } from "react";
 import { useHttp } from "../../api/http";
 import { useCallback } from "react";
 import { CarsTable } from "../CarsTable";
@@ -6,22 +6,12 @@ import { LiveSearch } from "../LiveSearch";
 import { DataContext } from "../../context";
 import { AddButton } from "../AddButton";
 import { Container } from "@mui/material";
+import { columns } from "../../context";
 
 const App = () => {
   const { request } = useHttp();
   const [data, setData] = useState();
   const [filter, setFilter] = useState();
-
-  const columns = [
-    { id: "car", label: "Company", minWidth: 130 },
-    { id: "car_model", label: "Model", minWidth: 130 },
-    { id: "car_vin", label: "VIN", minWidth: 130 },
-    { id: "car_color", label: "Color", minWidth: 130 },
-    { id: "car_model_year", label: "Year", minWidth: 130 },
-    { id: "price", label: "Price", minWidth: 130 },
-    { id: "availability", label: "Availability", minWidth: 130 },
-    { id: "actions", label: "Actions", minWidth: 130 },
-  ];
 
   const getElements = useCallback(async () => {
     await request("https://myfakeapi.com/api/cars/").then((data) =>

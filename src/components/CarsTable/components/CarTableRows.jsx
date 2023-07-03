@@ -6,10 +6,10 @@ import {
   FormControl,
   Select,
 } from "@mui/material";
-import { DeleteWarningModal } from "../../../Modals";
+import { DeleteWarningModal } from "../../Modals";
 import { useContext, useState } from "react";
 import { DataContext } from "../../../context";
-import { EditModal } from "../../../Modals/EditModal";
+import { EditModal } from "../../Modals/EditModal";
 
 export const CarTableRows = ({ row, columns }) => {
   const { setData, data } = useContext(DataContext);
@@ -71,11 +71,7 @@ export const CarTableRows = ({ row, columns }) => {
         setOpen={setOpenDeleteModal}
         DeleteHendler={DeleteCarHendler}
       />
-      <EditModal
-        open={openEditModal}
-        setOpen={setOpenEditModal}
-        item={row}
-      />
+      <EditModal open={openEditModal} setOpen={setOpenEditModal} item={row} />
     </>
   );
 };
