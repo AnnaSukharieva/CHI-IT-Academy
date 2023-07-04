@@ -1,25 +1,20 @@
 import { Button } from "@mui/material";
 import { EditModal } from "../Modals";
-import { useState, useMemo, useCallback } from "react";
+import { useState } from "react";
 
 export const AddButton = () => {
- const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
- const handleAddClick = useCallback(() => {
-   setOpenModal(true);
- }, []);
+  const handleAddClick = () => {
+    setOpenModal(true);
+  };
 
- const button = useMemo(
-   () => (
-     <>
-       <Button variant="contained" onClick={handleAddClick}>
-         Add new car
-       </Button>
-       <EditModal open={openModal} setOpen={setOpenModal} />
-     </>
-   ),
-   [handleAddClick, openModal]
- );
-
- return button;
+  return (
+    <>
+      <Button variant="contained" onClick={handleAddClick}>
+        Add new car
+      </Button>
+      <EditModal open={openModal} setOpen={setOpenModal} />
+    </>
+  );
 };

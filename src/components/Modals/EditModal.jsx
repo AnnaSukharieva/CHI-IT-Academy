@@ -10,43 +10,38 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { DataContext } from "../../context";
+import { memo } from "react";
 import PropTypes from "prop-types";
-import { useContext, useCallback, useMemo } from "react";
+import { useContext } from "react";
 
-export const EditModal = ({ open, setOpen, item }) => {
+export const EditModal = memo(({ open, setOpen, item }) => {
   const { columns, setData, data } = useContext(DataContext);
-  const newItem = useMemo(() => (item ? { ...item } : {}), [item]);
+  const newItem = item ? { ...item } : {};
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     setOpen(false);
-  }, [setOpen]);
+  };
 
-  const saveChanges = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (item) {
-        const newData = data.map((item) =>
-          item.id === newItem.id ? newItem : item
-        );
-        setData(newData);
-      } else {
-        newItem.id = data.length;
-        setData((prevData) => [newItem, ...prevData]);
-      }
-      handleClose();
-    },
-    [data, handleClose, item, newItem, setData]
-  );
+  const saveChanges = (e) => {
+    e.preventDefault();
+    if (item) {
+      const newData = data.map((item) =>
+        item.id === newItem.id ? newItem : item
+      );
+      setData(newData);
+    } else {
+      newItem.id = data.length;
+      setData((prevData) => [newItem, ...prevData]);
+    }
+    handleClose();
+  };
 
-  const editHandler = useCallback(
-    (e, columnId) => {
-      const newValue = e.target.value;
-      newItem[columnId] = newValue;
-    },
-    [newItem]
-  );
+  const editHandler = (e, columnId) => {
+    const newValue = e.target.value;
+    newItem[columnId] = newValue;
+  };
 
-  const EditFields = useCallback(() => {
+  const EditFields = () => {
     return columns.map((column) => {
       if (column.label !== "Actions") {
         return (
@@ -69,36 +64,31 @@ export const EditModal = ({ open, setOpen, item }) => {
         );
       }
     });
-  }, [columns, editHandler, item]);
+  };
 
-  const dialog = useMemo(
-    () => (
-      <Dialog onClose={handleClose} open={open} PaperProps={PaperProps}>
-        <DialogTitle variant="h5" sx={dialogTitleStyles}>
-          <EditIcon fontSize="large" sx={{ mr: "10px" }} />
-          Edit car info
-        </DialogTitle>
-        <Divider />
-        <Box component="form" id="editForm" onSubmit={saveChanges}>
-          <DialogContent sx={dialogContentStyles}>
-            <EditFields />
-          </DialogContent>
-          <DialogActions>
-            <Button sx={{ color: "black" }} onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button variant="contained" type="submit">
-              Apply
-            </Button>
-          </DialogActions>
-        </Box>
-      </Dialog>
-    ),
-    [handleClose, open, saveChanges]
+  return (
+    <Dialog onClose={handleClose} open={open} PaperProps={PaperProps}>
+      <DialogTitle variant="h5" sx={dialogTitleStyles}>
+        <EditIcon fontSize="large" sx={{ mr: "10px" }} />
+        Edit car info
+      </DialogTitle>
+      <Divider />
+      <Box component="form" id="editForm" onSubmit={saveChanges}>
+        <DialogContent sx={dialogContentStyles}>
+          <EditFields />
+        </DialogContent>
+        <DialogActions>
+          <Button sx={{ color: "black" }} onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" type="submit">
+            Apply
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
   );
-
-  return dialog;
-};
+});
 
 const PaperProps = {
   sx: { borderRadius: 2, px: 2, py: 2 },

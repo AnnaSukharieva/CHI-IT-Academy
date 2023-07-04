@@ -5,7 +5,7 @@ import { DataContext } from "../../context";
 import { AddButton } from "../AddButton";
 import { columns } from "../../context";
 import { getCars } from "../../services/cars";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const App = () => {
   const [error, setError] = useState("");
@@ -24,16 +24,13 @@ const App = () => {
     });
   }, []);
 
-   const loadingLine = useMemo(
-     () => (
-       <Box sx={{ width: "100%" }}>
-         <LinearProgress />
-       </Box>
-     ),
-     []
-   );
+  const loadingLine = (
+    <Box sx={{ width: "100%" }}>
+      <LinearProgress />
+    </Box>
+  );
 
-  const searchKeywords = useCallback((array, keyword) => {
+  const searchKeywords = (array, keyword) => {
     keyword = keyword.toLowerCase();
 
     return array.filter((obj) => {
@@ -44,44 +41,36 @@ const App = () => {
         }
       });
     });
-  }, []);
+  };
 
   useEffect(() => {
     getElements();
   }, [getElements]);
 
-  const errorMsg = useMemo(
-    () => (error ? <Alert severity="error">{error}</Alert> : null),
-    [error]
-  );
+  const errorMsg = error ? <Alert severity="error">{error}</Alert> : null;
 
-  const appContent = useMemo(
-    () => (
-      <>
-        <DataContext.Provider value={{ setData, data, columns }}>
-          {errorMsg}
-          <Container
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <LiveSearch setFilter={setFilter} />
-            <AddButton />
-          </Container>
-          {!data ? (
-            loadingLine
-          ) : (
-            <CarsTable data={filter ? searchKeywords(data, filter) : data} />
-          )}
-        </DataContext.Provider>
-      </>
-    ),
-    [data, errorMsg, filter, searchKeywords]
+  return (
+    <>
+      <DataContext.Provider value={{ setData, data, columns }}>
+        {errorMsg}
+        <Container
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <LiveSearch setFilter={setFilter} />
+          <AddButton />
+        </Container>
+        {!data ? (
+          loadingLine
+        ) : (
+          <CarsTable data={filter ? searchKeywords(data, filter) : data} />
+        )}
+      </DataContext.Provider>
+    </>
   );
-
-  return appContent;
 };
 
 export default App;

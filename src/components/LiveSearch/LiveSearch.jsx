@@ -6,18 +6,13 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import PropTypes from "prop-types";
-import { useCallback, useMemo } from "react";
 
 export const LiveSearch = ({ setFilter }) => {
-  const handleChange = useCallback(
-    (e) => {
-      setFilter(e.target.value);
-    },
-    [setFilter]
-  );
+  const handleChange = (e) => {
+    setFilter(e.target.value);
+  };
 
-  const search = useMemo(
-    () => (
+  return (
       <FormControl sx={{ m: 1, width: "300px" }} variant="filled">
         <InputLabel htmlFor="search">Search</InputLabel>
         <FilledInput
@@ -30,11 +25,7 @@ export const LiveSearch = ({ setFilter }) => {
           }
         />
       </FormControl>
-    ),
-    [handleChange]
-  );
-
-  return search;
+    );
 };
 
 LiveSearch.propTypes = {
